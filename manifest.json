@@ -1,7 +1,7 @@
 {
   "id": "arch-browser-history",
   "name": "𝗔𝗿𝗰𝗵 Browser History",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "minAppVersion": "1.6.0",
   "description": "Writes your browser history into day notes by itself: finds every browser and profile on its own, folds repeated pages into one line, drops tracking junk and adult sites, and comes with a small extension that deletes adult visits from the browser.",
   "author": "Hoang Anh",

@@ -412,15 +412,18 @@ class ArchBrowserHistory extends Plugin {
       if (owner && owner !== this.app.vault.getName()) return;
       const words = L.lines(this.settings.adultWords);
       const sites = L.lines(this.settings.adultSites);
-      const urls = new Set();
+      // Grouped by browser: the extension in Chrome deletes Chrome's only.
+      const byBrowser = {};
       for (const src of sources) {
         let all = [];
         try { all = L.listUrls(src); } catch (_) { continue; }
-        for (const u of all) if (L.isAdult(u, words, sites)) urls.add(u);
+        const set = new Set(byBrowser[src.browser] || []);
+        for (const u of all) if (L.isAdult(u, words, sites)) set.add(u);
+        if (set.size) byBrowser[src.browser] = [...set].sort();
       }
-      const list = [...urls].sort();
-      if (L.writeSites(this.settings, L.cleanerFolder(), this.app.vault.getName(), list)) {
-        this.log(`browser cleaner: ${list.length} adult addresses still in the browsers, handed to the extension (${reason})`);
+      if (L.writeSites(this.settings, L.cleanerFolder(), this.app.vault.getName(), byBrowser)) {
+        const counts = Object.entries(byBrowser).map(([b, l]) => `${b} ${l.length}`).join(', ') || 'none';
+        this.log(`browser cleaner: adult addresses still in the browsers handed to the extension: ${counts} (${reason})`);
       }
     } catch (e) {
       this.log('could not hand adult addresses to the browser cleaner:', e.message);

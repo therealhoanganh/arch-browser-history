@@ -94,3 +94,12 @@ The plugin reads the database directly, so after each update it now lists the ad
 addresses still in each Chromium history and writes them into `sites.json`; extension 1.3.0
 deletes each by address, which Chrome allows for hidden entries too.
 
+## 2026-09-25 — 0.1.6, each browser gets only its own addresses
+
+0.1.5's first hand-over held 2,764 addresses, not about 270: Brave's were in it too, and
+the extension in Chrome would have deleted those for nothing on every sweep and, counting
+them, repeated every 5 minutes for ever. The list is now grouped by browser, the extension
+(1.4.0) takes its own browser's part (Brave is told apart by `navigator.brave`), and
+deletions by address no longer count toward the 5-minute repeat. Fixed before he reloaded,
+so one reload covers it.
+

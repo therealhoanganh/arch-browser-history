@@ -91,7 +91,9 @@ one request stopped with hundreds left. What neither reaches are **redirect
 steps**: visits without Chrome's chain-end flag, kept in the database but hidden
 from the history page and from extensions (281 of the 283 left). So after each
 update the plugin lists the adult addresses still in each Chromium database
-(`listUrls`) into `sites.json` as `urls`, and the sweep deletes them by address. Through the API a deletion also
+(`listUrls`) into `sites.json` as `urls`, grouped by browser (`{Chrome: […],
+Brave: […]}`), and the sweep deletes its own browser's by address. Those do not
+count toward the 5-minute repeat; the list shrinks as the browser lets go. Through the API a deletion also
 leaves Google sync, which editing the file would not. `background.js` carries
 `isAdult` copied with `toString()`, so the plugin and the extension cannot
 disagree. The list is `sites.json`, rewritten when the adult settings change and
