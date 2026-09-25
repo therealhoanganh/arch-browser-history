@@ -133,6 +133,10 @@ startup, and `TESTFIELD`'s empty *Sites* list would have replaced GENERALS'.
   took the last 283 matching visits, 281 of them hidden redirect steps, to 0
   visits and 0 addresses. **Brave does not have the extension yet**; 2,496 adult
   addresses wait for it in `sites.json`.
+- **TESTFIELD**: the plugin stays enabled there (symlink, for development) with
+  *Update automatically* off since 2026-09-25, so it no longer writes a second
+  copy of his history. Its `Browses/` (219 day notes, test output he approved)
+  is left for him to delete.
 - Not built: the PC's own browsers. They would be read by the same code if
   `automaticOn` named the PC, but two computers writing the same day notes would
   make Syncthing conflict files; that needs a design first.
