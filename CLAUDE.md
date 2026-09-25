@@ -115,12 +115,14 @@ startup, and `TESTFIELD`'s empty *Sites* list would have replaced GENERALS'.
   27 June) and the 114 old Ideaverse notes, imported with 44,859 visits kept and
   2,265 adult left out. Still runs in `TESTFIELD` too (symlink); its
   `Browses/` is test output, and was checked to hold nothing GENERALS lacks.
-- **0.1.2 in GENERALS** (copied in by hand on 2026-09-25: BRAT's `updatePlugin`
-  called through `obsidian eval` hung and never returned). The browser cleaner
-  (extension 1.1.0) is loaded in **Chrome** (not Brave yet). Its first sweep,
-  as 1.0.0, took Chrome from 1,496 matching addresses to 275 and stopped; 1.1.0
-  searches word by word and runs after its reload arrow is pressed. **The Sites
-  list is still empty**: his first *Add ticked sites* saved nothing anywhere.
+- **0.1.3 in GENERALS** (copied in by hand, as 0.1.2: BRAT's `updatePlugin`
+  through `obsidian eval` hung). His **40 sites** are in the *Sites* list,
+  among them broad ones he ticked himself: `itch.io`, `vk.com`, `vk.ru`,
+  `vkvideo.ru`, `feedspot.com`, `link.me`, `recoverylighthouse.com`. 550 lines
+  from them were removed from 36 day notes (GENERALS commit of 2026-09-25).
+- The browser cleaner is loaded in **Chrome** (not Brave yet), still as 1.0.0
+  until its reload arrow is pressed; Chrome held 1,037 visits to listed sites at
+  17:11. 1.1.0 (word-by-word sweep) is on disk.
 - Not built: the PC's own browsers. They would be read by the same code if
   `automaticOn` named the PC, but two computers writing the same day notes would
   make Syncthing conflict files; that needs a design first.
