@@ -1,6 +1,6 @@
 {
   "name": "arch-browser-history",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Obsidian plugin that writes browser history into day notes, with repeats folded and adult sites removed.",
   "private": true,
   "scripts": {

@@ -73,6 +73,7 @@ class ArchBrowserHistory extends Plugin {
 
     this.addCommand({ id: 'update-now', name: 'Update browser history now', callback: () => this.update('command') });
     this.addCommand({ id: 'import-old-notes', name: 'Import day notes from the old Browser History plugin', callback: () => new ImportModal(this.app, this).open() });
+    this.addCommand({ id: 'purge-adult', name: 'Remove adult sites from the day notes already written', callback: () => this.purgeAdultFromNotes('command') });
     this.addCommand({ id: 'install-cleaner', name: 'Install or update the browser cleaner extension', callback: () => this.installCleaner() });
 
     this.addSettingTab(new ArchBrowserHistorySettingTab(this.app, this));
@@ -324,6 +325,50 @@ class ArchBrowserHistory extends Plugin {
     new Notice(`Browser history: ${summary}.`, 15000);
   }
 
+  /* ---------------- adult lines already written ---------------- */
+
+  // His decision was that adult visits are written nowhere. A site added to the
+  // list later still sits in the day notes written before (550 lines in 36 notes
+  // when his first 40 sites went in), so a change to the list also clears them
+  // from every day note in the day-note folder.
+  async purgeAdultFromNotes(reason) {
+    if (this.running) { this.purgeAgain = true; return; }
+    this.running = true;
+    try {
+      const L = this.lib();
+      const words = L.lines(this.settings.adultWords);
+      const sites = L.lines(this.settings.adultSites);
+      const root = this.dayFolder();
+      const files = this.app.vault.getMarkdownFiles().filter((f) => !root || f.path.startsWith(root + '/'));
+      let removed = 0;
+      let notes = 0;
+      for (const f of files) {
+        const text = await this.app.vault.read(f);
+        const { head, entries } = L.parseDayNote(text, 0);
+        if (!entries.length) continue;
+        const keep = entries.filter((e) => !L.isAdult(e.url, words, sites));
+        if (keep.length === entries.length) continue;
+        removed += entries.length - keep.length;
+        notes++;
+        // Times are re-rendered from each entry's own clock time, so the day's
+        // start does not matter here.
+        await this.app.vault.modify(f, L.renderDayNote(head, keep, (ms) => moment.utc(ms).format('HH:mm')));
+      }
+      this.log(`adult lines removed from day notes (${reason}): ${removed} lines in ${notes} notes`);
+      if (removed) new Notice(`Browser history: ${removed} adult lines removed from ${notes} day notes.`);
+    } finally {
+      this.running = false;
+      if (this.purgeAgain) { this.purgeAgain = false; this.purgeAdultFromNotes('list changed during the last pass'); }
+    }
+  }
+
+  // Typing in the Words or Sites box saves on every key; the pass waits for a
+  // pause so it runs once per edit rather than once per letter.
+  schedulePurge() {
+    if (this.purgeTimer) window.clearTimeout(this.purgeTimer);
+    this.purgeTimer = window.setTimeout(() => this.purgeAdultFromNotes('adult list edited'), 3000);
+  }
+
   /* ---------------- the browser cleaner ---------------- */
 
   cleanerFolder() { return this.lib().cleanerFolder(); }
@@ -492,6 +537,7 @@ class CandidatesModal extends Modal {
       await this.plugin.saveSettings();
       this.plugin.refreshCleanerList();
       this.plugin.log('adult sites added:', add.join(', ') || '(none)');
+      if (add.length) this.plugin.purgeAdultFromNotes('sites added');
       new Notice(`Adult sites added: ${add.length}.`);
       this.saved = true;
       this.close();
@@ -602,10 +648,10 @@ class ArchBrowserHistorySettingTab extends PluginSettingTab {
     containerEl.createEl('p', { cls: 'setting-item-description', text: 'Visits to these are never written to a note, and the browser cleaner deletes them from the browser.' });
     this.textArea(containerEl, 'Words',
       'A site whose address contains one of these, or a search for one of them, counts as adult.',
-      'adultWords', () => p.refreshCleanerList());
+      'adultWords', () => { p.refreshCleanerList(); p.schedulePurge(); });
     this.textArea(containerEl, 'Sites',
       'Sites to treat as adult whatever their address says, one per line (example.com, or example.com/path). Stays in this vault\'s settings.',
-      'adultSites', () => p.refreshCleanerList());
+      'adultSites', () => { p.refreshCleanerList(); p.schedulePurge(); });
     new Setting(containerEl)
       .setName('Find more in my history')
       .setDesc('Lists sites whose page titles use the words above, to add with a tick.')

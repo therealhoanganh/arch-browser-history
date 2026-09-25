@@ -57,6 +57,11 @@ requires `obsidian`).
   in the vault's settings**, because the repository is public (his decision, so
   BRAT can install it). *Find more in my history* lists sites whose page titles
   use the words, ticked when half their pages do; he confirms each.
+- **A change to the adult list reaches old notes too.** Adding sites, or editing
+  *Words* / *Sites* (after a 3-second pause in typing), removes matching lines
+  from every day note in the day-note folder; the command *Remove adult sites
+  from the day notes already written* does it by hand. GENERALS' git history is
+  where a wrongly removed line comes back from.
 - **Day notes are merged, never regenerated.** A note is parsed back
   (`parseDayNote`), new visits merged, and written again, so lines Chrome has
   forgotten, imported lines and a highlight he added (`- ==21:09 […]==`) survive.

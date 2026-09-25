@@ -66,3 +66,12 @@ there, with 270 of them ordinary visits it should have found. Its sweep (extensi
 now also runs Chrome's own history search for each word and site, which matches address and
 title, instead of trusting the whole-history listing alone.
 
+## 2026-09-25 — 0.1.3, adding a site clears it from the notes already written
+
+He added his sites (*"I think I didn't click the button before so it wasn't saved"*): 40
+went in. The day notes already in GENERALS still held 550 lines from them in 36 notes,
+because the filter only met new visits. Since his decision was that adult visits are written
+nowhere, adding sites (or editing *Words* / *Sites*) now removes their lines from every day
+note, and a command does the same by hand. Checked on a copy first: exactly those 550 lines
+went and every other line came out byte for byte the same.
+
