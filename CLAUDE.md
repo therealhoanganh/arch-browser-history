@@ -96,6 +96,9 @@ startup, and `TESTFIELD`'s empty *Sites* list would have replaced GENERALS'.
 
 - `obsidian eval` works only for a vault open in a window (`vault=TESTFIELD`); a
   new plugin folder needs `app.plugins.loadManifests()` before it can be enabled.
+  A long eval (one that runs *Find*, or BRAT's `updatePlugin`) outlives the CLI's
+  wait and can leave later evals to that vault hanging; `obsidian plugin:reload
+  id=…` still works then.
 - Deleting a folder on disk under a running Obsidian leaves it in the vault's
   file list for a moment. `ensureFolder` asks the adapter (disk), because
   trusting the file list failed a whole update with `ENOENT`.
@@ -107,10 +110,12 @@ startup, and `TESTFIELD`'s empty *Sites* list would have replaced GENERALS'.
   27 June) and the 114 old Ideaverse notes, imported with 44,859 visits kept and
   2,265 adult left out. Still runs in `TESTFIELD` too (symlink); its
   `Browses/` is test output, and was checked to hold nothing GENERALS lacks.
-- The browser cleaner is written to `~/Library/Application Support/ARCH Browser
-  Cleaner`; **he loads it in Chrome and Brave by hand**, and adds his sites with
-  *Find more in my history* in GENERALS' settings (the *Sites* list is empty).
-  Not yet seen running inside a browser.
+- **0.1.2 in GENERALS** (copied in by hand on 2026-09-25: BRAT's `updatePlugin`
+  called through `obsidian eval` hung and never returned). The browser cleaner
+  (extension 1.1.0) is loaded in **Chrome** (not Brave yet). Its first sweep,
+  as 1.0.0, took Chrome from 1,496 matching addresses to 275 and stopped; 1.1.0
+  searches word by word and runs after its reload arrow is pressed. **The Sites
+  list is still empty**: his first *Add ticked sites* saved nothing anywhere.
 - Not built: the PC's own browsers. They would be read by the same code if
   `automaticOn` named the PC, but two computers writing the same day notes would
   make Syncthing conflict files; that needs a design first.
