@@ -87,7 +87,11 @@ adult visits through `chrome.history` as they happen (`onVisited`) and sweeps al
 history at install and browser start, then hourly, or every 5 minutes while a
 sweep still finds something. A sweep asks one day at a time (120 days) and then
 Chrome's search for each word and site: two sweeps that asked for everything in
-one request stopped with hundreds left. Through the API a deletion also
+one request stopped with hundreds left. What neither reaches are **redirect
+steps**: visits without Chrome's chain-end flag, kept in the database but hidden
+from the history page and from extensions (281 of the 283 left). So after each
+update the plugin lists the adult addresses still in each Chromium database
+(`listUrls`) into `sites.json` as `urls`, and the sweep deletes them by address. Through the API a deletion also
 leaves Google sync, which editing the file would not. `background.js` carries
 `isAdult` copied with `toString()`, so the plugin and the extension cannot
 disagree. The list is `sites.json`, rewritten when the adult settings change and

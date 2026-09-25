@@ -191,6 +191,7 @@ class ArchBrowserHistory extends Plugin {
       }
 
       const written = await this.writeDays(byDay);
+      this.handAdultUrlsToCleaner(found.filter((src) => !disabled.has(src.id)), reason);
       // Cursors move only after the notes are written, so a failed write is
       // read again next time rather than lost.
       Object.assign(cursors, newCursors);
@@ -397,6 +398,32 @@ class ArchBrowserHistory extends Plugin {
       if (changed.length) this.log('browser cleaner updated:', changed.join(', '), changed.some((c) => c !== 'sites.json') ? '-- reload it on the browser\'s extensions page' : '');
     } catch (e) {
       this.log('could not update the browser cleaner:', e.message);
+    }
+  }
+
+  // The extension cannot see redirect steps; the database can. After each
+  // update the adult addresses still in the Chromium histories go into
+  // sites.json, and the extension's next sweep deletes them by name.
+  handAdultUrlsToCleaner(sources, reason) {
+    try {
+      if (!this.cleanerInstalled()) return;
+      const L = this.lib();
+      const owner = L.sitesOwner();
+      if (owner && owner !== this.app.vault.getName()) return;
+      const words = L.lines(this.settings.adultWords);
+      const sites = L.lines(this.settings.adultSites);
+      const urls = new Set();
+      for (const src of sources) {
+        let all = [];
+        try { all = L.listUrls(src); } catch (_) { continue; }
+        for (const u of all) if (L.isAdult(u, words, sites)) urls.add(u);
+      }
+      const list = [...urls].sort();
+      if (L.writeSites(this.settings, L.cleanerFolder(), this.app.vault.getName(), list)) {
+        this.log(`browser cleaner: ${list.length} adult addresses still in the browsers, handed to the extension (${reason})`);
+      }
+    } catch (e) {
+      this.log('could not hand adult addresses to the browser cleaner:', e.message);
     }
   }
 

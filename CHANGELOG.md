@@ -85,3 +85,12 @@ from outside Chrome the two cannot be told apart. Extension 1.2.0 asks the histo
 at a time for 120 days, then by word, and while a sweep still deletes something it runs
 again in 5 minutes instead of an hour.
 
+## 2026-09-25 — 0.1.5, the plugin hands the extension the addresses it cannot see
+
+The day-by-day sweep (1.2.0) also stopped at 283. Their flags in Chrome's database explained
+it: 281 of the 283 visits are redirect steps (no chain-end flag), which Chrome keeps but
+hides from its history page and from extensions, so no search could ever return them.
+The plugin reads the database directly, so after each update it now lists the adult
+addresses still in each Chromium history and writes them into `sites.json`; extension 1.3.0
+deletes each by address, which Chrome allows for hidden entries too.
+
