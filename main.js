@@ -472,6 +472,10 @@ class CandidatesModal extends Modal {
     contentEl.createEl('h3', { text: 'Sites that look adult' });
     contentEl.createEl('p', { text: 'Sites in the browser history whose page titles use the adult words but whose address does not. Ticked: most of their pages match. Tick the ones to add; they are then left out of the notes and deleted from the browser.' });
     const chosen = new Set();
+    this.chosen = chosen;
+    // The button is at the top as well: under fifty rows it was out of sight,
+    // and on 2026-09-25 a first try closed the list without anything saved.
+    const addRow = new Setting(contentEl);
     for (const c of this.candidates.slice(0, 60)) {
       const share = c.hits / c.visits;
       if (share >= 0.5) chosen.add(c.domain);
@@ -480,7 +484,7 @@ class CandidatesModal extends Modal {
         .setDesc(c.example.slice(0, 120))
         .addToggle((t) => t.setValue(share >= 0.5).onChange((v) => (v ? chosen.add(c.domain) : chosen.delete(c.domain))));
     }
-    new Setting(contentEl).addButton((b) => b.setButtonText('Add ticked sites').setCta().onClick(async () => {
+    const add = async () => {
       const s = this.plugin.settings;
       const have = new Set(this.plugin.lib().lines(s.adultSites));
       const add = [...chosen].filter((d) => !have.has(d));
@@ -488,11 +492,21 @@ class CandidatesModal extends Modal {
       await this.plugin.saveSettings();
       this.plugin.refreshCleanerList();
       this.plugin.log('adult sites added:', add.join(', ') || '(none)');
+      new Notice(`Adult sites added: ${add.length}.`);
+      this.saved = true;
       this.close();
       this.onDone();
-    }));
+    };
+    addRow.addButton((b) => b.setButtonText('Add ticked sites').setCta().onClick(add));
+    new Setting(contentEl).addButton((b) => b.setButtonText('Add ticked sites').setCta().onClick(add));
   }
-  onClose() { this.contentEl.empty(); }
+  onClose() {
+    this.contentEl.empty();
+    if (!this.saved && this.chosen && this.chosen.size) {
+      new Notice(`Nothing was added: the list closed before "Add ticked sites" was pressed (${this.chosen.size} ticked).`, 10000);
+      this.plugin.log('adult sites list closed without adding;', this.chosen.size, 'were ticked');
+    }
+  }
 }
 
 /* ---------------- settings tab ---------------- */
@@ -595,7 +609,10 @@ class ArchBrowserHistorySettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName('Find more in my history')
       .setDesc('Lists sites whose page titles use the words above, to add with a tick.')
-      .addButton((b) => b.setButtonText('Find').onClick(() => {
+      .addButton((b) => b.setButtonText('Find').onClick(async () => {
+        // Reading every visit takes a few seconds with Obsidian paused; say so first.
+        new Notice('Reading the browser history…');
+        await new Promise((r) => setTimeout(r, 50));
         const c = p.findAdultCandidates();
         if (!c.length) { new Notice('Nothing found.'); return; }
         new CandidatesModal(this.app, p, c, () => this.display()).open();

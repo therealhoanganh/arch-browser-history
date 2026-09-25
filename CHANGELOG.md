@@ -52,3 +52,17 @@ index (0 tags across 206 day notes, `#catnip` absent from the tag list).
 Found while installing: every vault with the plugin rewrote the extension's `sites.json` at
 startup, so TESTFIELD (empty *Sites* list) would have replaced the sites he adds in
 GENERALS. The list now records its vault, and only that vault updates it by itself.
+
+## 2026-09-25 — 0.1.2, the sweep searches by word, and the site list cannot be closed unsaved
+
+He loaded the extension in Chrome and reported *"Add ticked sites"*, but nothing had been
+saved in any vault (GENERALS, TESTFIELD, the PC's copy); the button itself was tested and
+works, so the list was most likely closed without the press, the button then sitting below
+fifty rows. It now sits above the list too, and closing with sites ticked but not added
+says so. *Find* also announces itself, since it pauses Obsidian for about three seconds.
+
+The extension's first sweep took Chrome from 1,496 matching addresses to 275 and stopped
+there, with 270 of them ordinary visits it should have found. Its sweep (extension 1.1.0)
+now also runs Chrome's own history search for each word and site, which matches address and
+title, instead of trusting the whole-history listing alone.
+
