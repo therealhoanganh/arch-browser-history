@@ -84,7 +84,10 @@ requires `obsidian`).
 because a browser loads an unpacked extension by path, and a path that moved
 with a vault would break it the way the old plugin's setting broke. It deletes
 adult visits through `chrome.history` as they happen (`onVisited`) and sweeps all
-history at install, at browser start and hourly. Through the API a deletion also
+history at install and browser start, then hourly, or every 5 minutes while a
+sweep still finds something. A sweep asks one day at a time (120 days) and then
+Chrome's search for each word and site: two sweeps that asked for everything in
+one request stopped with hundreds left. Through the API a deletion also
 leaves Google sync, which editing the file would not. `background.js` carries
 `isAdult` copied with `toString()`, so the plugin and the extension cannot
 disagree. The list is `sites.json`, rewritten when the adult settings change and

@@ -75,3 +75,13 @@ nowhere, adding sites (or editing *Words* / *Sites*) now removes their lines fro
 note, and a command does the same by hand. Checked on a copy first: exactly those 550 lines
 went and every other line came out byte for byte the same.
 
+## 2026-09-25 — 0.1.4, the sweep asks day by day and repeats until clean
+
+After he reloaded the extension (1.1.0), Chrome went from 1,037 visits to his listed sites to
+283 and held there for three samples 20 seconds apart. What was left were ordinary pages on
+listed sites (`f95zone.to/threads/…`, `tubepornstars.com`), so neither the whole-history
+request nor the word searches were returning them, or the service worker stopped part way;
+from outside Chrome the two cannot be told apart. Extension 1.2.0 asks the history one day
+at a time for 120 days, then by word, and while a sweep still deletes something it runs
+again in 5 minutes instead of an hour.
+
