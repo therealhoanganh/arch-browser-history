@@ -37,3 +37,12 @@ count, tracking parameters and noise pages dropped, `#` escaped in titles,
 merged day notes, the import command, the *Find more in my history* helper, and
 the browser cleaner extension. Tested in `TESTFIELD`; figures in `CLAUDE.md`,
 *Where things stand*.
+
+## 2026-09-25 — 0.1.0 released, installed in GENERALS
+
+He looked at `TESTFIELD/Browses` (*"looks good"*) and said go. Public repository created,
+0.1.0 released, installed through BRAT in GENERALS, the Ideaverse notes imported there, the
+cleaner extension written. He asked how the tags stopped leaking, with the example
+`Thanh cỏ mèo catnip \#review \#catnip …`: the backslash escape, checked in Obsidian's own
+index (0 tags across 206 day notes, `#catnip` absent from the tag list).
+

@@ -101,15 +101,15 @@ GENERALS narrows the extension to the generic words until GENERALS next starts.
 
 ## Where things stand (edit in place)
 
-- **0.1.0, not released, not on GitHub yet.** Runs in `TESTFIELD` (symlink):
-  2026-09-25 the first run read 110,339 visits (Chrome, Brave, Safari) into
-  23,056 lines over 109 days in 14 s, 9,104 adult visits left out; the import of
-  the 114 old Ideaverse day notes kept 44,890 visits as 14,637 lines, 2,234 adult
-  and two `data:image` junk lines left out, the originals untouched.
-- Next, once he has looked at `TESTFIELD/Browses`: create the public repo,
-  release 0.1.0, install in GENERALS, run the import there (the Ideaverse folder
-  and, for the days Chrome has dropped since, `TESTFIELD/Browses`), and he loads
-  the cleaner in Chrome and Brave.
+- **0.1.0 released** (2026-09-25) and installed through BRAT in **GENERALS**, which
+  has `Browses/` with 219 day notes: the browsers from 9 June (Chrome from
+  27 June) and the 114 old Ideaverse notes, imported with 44,859 visits kept and
+  2,265 adult left out. Still runs in `TESTFIELD` too (symlink); its
+  `Browses/` is test output, and was checked to hold nothing GENERALS lacks.
+- The browser cleaner is written to `~/Library/Application Support/ARCH Browser
+  Cleaner`; **he loads it in Chrome and Brave by hand**, and adds his sites with
+  *Find more in my history* in GENERALS' settings (the *Sites* list is empty).
+  Not yet seen running inside a browser.
 - Not built: the PC's own browsers. They would be read by the same code if
   `automaticOn` named the PC, but two computers writing the same day notes would
   make Syncthing conflict files; that needs a design first.
