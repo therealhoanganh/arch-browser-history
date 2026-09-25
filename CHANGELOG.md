@@ -46,3 +46,9 @@ cleaner extension written. He asked how the tags stopped leaking, with the examp
 `Thanh cỏ mèo catnip \#review \#catnip …`: the backslash escape, checked in Obsidian's own
 index (0 tags across 206 day notes, `#catnip` absent from the tag list).
 
+
+## 2026-09-25 — 0.1.1, the extension's list follows one vault
+
+Found while installing: every vault with the plugin rewrote the extension's `sites.json` at
+startup, so TESTFIELD (empty *Sites* list) would have replaced the sites he adds in
+GENERALS. The list now records its vault, and only that vault updates it by itself.

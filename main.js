@@ -330,7 +330,8 @@ class ArchBrowserHistory extends Plugin {
   cleanerInstalled() { return fs.existsSync(path.join(this.cleanerFolder(), 'manifest.json')); }
 
   installCleaner() {
-    const changed = this.lib().writeCleaner(this.settings);
+    // Installing from a vault makes it the one whose list the extension follows.
+    const changed = this.lib().writeCleaner(this.settings, this.cleanerFolder(), this.app.vault.getName());
     this.log('browser cleaner written to', this.cleanerFolder(), changed.length ? `(${changed.join(', ')})` : '(already current)');
     new CleanerModal(this.app, this).open();
   }
@@ -341,8 +342,13 @@ class ArchBrowserHistory extends Plugin {
   refreshCleanerList() {
     try {
       if (!this.cleanerInstalled()) return;
+      const owner = this.lib().sitesOwner();
+      if (owner && owner !== this.app.vault.getName()) {
+        this.log(`browser cleaner follows the ${owner} vault's list; not changed from here (install it from this vault to switch)`);
+        return;
+      }
       // Rewrites background.js too when a new plugin version changed it.
-      const changed = this.lib().writeCleaner(this.settings);
+      const changed = this.lib().writeCleaner(this.settings, this.lib().cleanerFolder(), this.app.vault.getName());
       if (changed.length) this.log('browser cleaner updated:', changed.join(', '), changed.some((c) => c !== 'sites.json') ? '-- reload it on the browser\'s extensions page' : '');
     } catch (e) {
       this.log('could not update the browser cleaner:', e.message);

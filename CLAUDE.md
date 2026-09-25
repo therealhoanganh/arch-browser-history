@@ -87,9 +87,10 @@ at startup. **He installs it once per browser by hand**: Developer mode, *Load
 unpacked*, that folder. After a plugin version that changes `background.js`, the
 extension needs its reload arrow pressed.
 
-Trap: every vault with this plugin rewrites the one `sites.json` from its own
-settings at startup. `TESTFIELD` has an empty *Sites* list, so opening it after
-GENERALS narrows the extension to the generic words until GENERALS next starts.
+One extension serves every vault with the plugin, so `sites.json` records the
+vault it came from (`vault`), and only that vault rewrites it by itself;
+installing from another vault switches it. Before 0.1.1 every vault rewrote it at
+startup, and `TESTFIELD`'s empty *Sites* list would have replaced GENERALS'.
 
 ## Things learned building it
 
