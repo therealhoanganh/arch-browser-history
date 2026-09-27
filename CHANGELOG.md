@@ -103,3 +103,13 @@ them, repeated every 5 minutes for ever. The list is now grouped by browser, the
 deletions by address no longer count toward the 5-minute repeat. Fixed before he reloaded,
 so one reload covers it.
 
+## 2026-09-27 — 0.1.7, Title Case and Obsidian's own headings
+
+From the web-design-guidelines review of 2026-09-27 (`~/Documents/ARCH UI Review.md`), whose
+whole list he approved: *"Yes, proceed on."* Every label is in Title Case, Chicago style, as
+in ARCH Images Plus 0.7.6: his preference, *"Actually, I much prefer Title Case."* The
+settings headings are Obsidian's own (`setHeading`) rather than plain `h3` text, which looked
+different from the other ARCH plugins, and the three popups' titles are real titles. The
+cleaner popup's *Show in Finder* button reads *Show in Files* on the PC (*Show in Explorer*
+on Windows), since only the Mac has a Finder. No spell-check underlines in the settings or
+the import folder box, whose fields hold paths, patterns and site lists.

@@ -32,6 +32,6 @@ Through [BRAT](https://github.com/TfTHacker/obsidian42-brat): add
 
 ## The browser cleaner
 
-Run *Install or update the browser cleaner extension*, then in Chrome
+Run *Install or Update the Browser Cleaner Extension*, then in Chrome
 (`chrome://extensions`) or Brave (`brave://extensions`) turn on Developer mode,
 click *Load unpacked* and choose the folder the plugin shows.

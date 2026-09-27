@@ -71,10 +71,10 @@ class ArchBrowserHistory extends Plugin {
     this.running = false;
     this.lastMtime = {};
 
-    this.addCommand({ id: 'update-now', name: 'Update browser history now', callback: () => this.update('command') });
-    this.addCommand({ id: 'import-old-notes', name: 'Import day notes from the old Browser History plugin', callback: () => new ImportModal(this.app, this).open() });
-    this.addCommand({ id: 'purge-adult', name: 'Remove adult sites from the day notes already written', callback: () => this.purgeAdultFromNotes('command') });
-    this.addCommand({ id: 'install-cleaner', name: 'Install or update the browser cleaner extension', callback: () => this.installCleaner() });
+    this.addCommand({ id: 'update-now', name: 'Update Browser History Now', callback: () => this.update('command') });
+    this.addCommand({ id: 'import-old-notes', name: 'Import Day Notes from the Old Browser History Plugin', callback: () => new ImportModal(this.app, this).open() });
+    this.addCommand({ id: 'purge-adult', name: 'Remove Adult Sites from the Day Notes Already Written', callback: () => this.purgeAdultFromNotes('command') });
+    this.addCommand({ id: 'install-cleaner', name: 'Install or Update the Browser Cleaner Extension', callback: () => this.installCleaner() });
 
     this.addSettingTab(new ArchBrowserHistorySettingTab(this.app, this));
 
@@ -503,11 +503,12 @@ class ImportModal extends Modal {
   constructor(app, plugin) { super(app); this.plugin = plugin; }
   onOpen() {
     const { contentEl } = this;
-    contentEl.createEl('h3', { text: 'Import old browser history notes' });
+    this.titleEl.setText('Import Old Browser History Notes');
     contentEl.createEl('p', { text: 'The folder that holds the day notes, as a full path on this computer. Month subfolders are read too. The notes there are only read, never changed. Adult sites, noise pages and repeats are left out the same way as for a browser, and lines already in a day note here are kept.' });
     let value = '';
     new Setting(contentEl).setName('Folder').addText((t) => {
       t.inputEl.style.width = '100%';
+      t.inputEl.spellcheck = false;
       t.setPlaceholder('/Users/…/Browses').onChange((v) => { value = v.trim(); });
     });
     new Setting(contentEl).addButton((b) => b.setButtonText('Import').setCta().onClick(async () => {
@@ -524,7 +525,7 @@ class CleanerModal extends Modal {
   onOpen() {
     const { contentEl } = this;
     const folder = this.plugin.cleanerFolder();
-    contentEl.createEl('h3', { text: 'Browser cleaner' });
+    this.titleEl.setText('Browser Cleaner');
     contentEl.createEl('p', { text: 'The extension is written. It deletes visits to adult sites from the browser\'s history as they happen, and once an hour sweeps what is already there. To load it, once per browser (Chrome, Brave):' });
     const ol = contentEl.createEl('ol');
     ol.createEl('li', { text: 'Open the extensions page: chrome://extensions in Chrome, brave://extensions in Brave.' });
@@ -534,8 +535,9 @@ class CleanerModal extends Modal {
     code.setText(folder);
     contentEl.createEl('p', { text: 'Changes to the adult site list reach the extension by themselves. After a new version of this plugin, press the extension\'s reload arrow on that page.' });
     new Setting(contentEl)
-      .addButton((b) => b.setButtonText('Copy folder path').onClick(() => { navigator.clipboard.writeText(folder); new Notice('Copied.'); }))
-      .addButton((b) => b.setButtonText('Show in Finder').onClick(() => { require('electron').shell.openPath(folder); }));
+      .addButton((b) => b.setButtonText('Copy Folder Path').onClick(() => { navigator.clipboard.writeText(folder); new Notice('Copied.'); }))
+      // Finder is the Mac's; the PC and Windows have their own file manager.
+      .addButton((b) => b.setButtonText(process.platform === 'darwin' ? 'Show in Finder' : process.platform === 'win32' ? 'Show in Explorer' : 'Show in Files').onClick(() => { require('electron').shell.openPath(folder); }));
   }
   onClose() { this.contentEl.empty(); }
 }
@@ -544,7 +546,7 @@ class CandidatesModal extends Modal {
   constructor(app, plugin, candidates, onDone) { super(app); this.plugin = plugin; this.candidates = candidates; this.onDone = onDone; }
   onOpen() {
     const { contentEl } = this;
-    contentEl.createEl('h3', { text: 'Sites that look adult' });
+    this.titleEl.setText('Sites That Look Adult');
     contentEl.createEl('p', { text: 'Sites in the browser history whose page titles use the adult words but whose address does not. Ticked: most of their pages match. Tick the ones to add; they are then left out of the notes and deleted from the browser.' });
     const chosen = new Set();
     this.chosen = chosen;
@@ -573,13 +575,13 @@ class CandidatesModal extends Modal {
       this.close();
       this.onDone();
     };
-    addRow.addButton((b) => b.setButtonText('Add ticked sites').setCta().onClick(add));
-    new Setting(contentEl).addButton((b) => b.setButtonText('Add ticked sites').setCta().onClick(add));
+    addRow.addButton((b) => b.setButtonText('Add Ticked Sites').setCta().onClick(add));
+    new Setting(contentEl).addButton((b) => b.setButtonText('Add Ticked Sites').setCta().onClick(add));
   }
   onClose() {
     this.contentEl.empty();
     if (!this.saved && this.chosen && this.chosen.size) {
-      new Notice(`Nothing was added: the list closed before "Add ticked sites" was pressed (${this.chosen.size} ticked).`, 10000);
+      new Notice(`Nothing was added: the list closed before "Add Ticked Sites" was pressed (${this.chosen.size} ticked).`, 10000);
       this.plugin.log('adult sites list closed without adding;', this.chosen.size, 'were ticked');
     }
   }
@@ -588,7 +590,15 @@ class CandidatesModal extends Modal {
 /* ---------------- settings tab ---------------- */
 
 class ArchBrowserHistorySettingTab extends PluginSettingTab {
-  constructor(app, plugin) { super(app, plugin); this.plugin = plugin; }
+  constructor(app, plugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+    // Its fields hold paths, commands, patterns and lists, not prose, so no
+    // spell-check underlines; set as each one gets focus, which is when they appear.
+    this.containerEl.addEventListener('focusin', (e) => {
+      if (e.target.matches('input[type="text"], input:not([type]), textarea')) e.target.spellcheck = false;
+    });
+  }
 
   display() {
     const { containerEl } = this;
@@ -597,37 +607,37 @@ class ArchBrowserHistorySettingTab extends PluginSettingTab {
     const save = async () => { await p.saveSettings(); };
     containerEl.empty();
 
-    containerEl.createEl('h3', { text: 'Day notes' });
+    new Setting(containerEl).setName('Day Notes').setHeading();
 
     new Setting(containerEl)
-      .setName('Where day notes go')
+      .setName('Where Day Notes Go')
       .setDesc('"Same" and "subfolder" are relative to the folder the core Daily notes plugin writes to.')
       .addDropdown((d) => d
-        .addOption('vault', 'Vault root')
-        .addOption('same', 'Same folder as daily notes')
-        .addOption('subfolder', 'Subfolder of the daily notes folder')
-        .addOption('specified', 'A folder specified below')
+        .addOption('vault', 'Vault Root')
+        .addOption('same', 'Same Folder as Daily Notes')
+        .addOption('subfolder', 'Subfolder of the Daily Notes Folder')
+        .addOption('specified', 'A Folder Specified Below')
         .setValue(s.folderMode)
         .onChange(async (v) => { s.folderMode = v; await save(); this.display(); }));
     if (s.folderMode === 'specified') {
       new Setting(containerEl).setName('Folder').addText((t) => t.setValue(s.folder).onChange(async (v) => { s.folder = v.trim(); await save(); }));
     }
     if (s.folderMode === 'subfolder') {
-      new Setting(containerEl).setName('Subfolder name').addText((t) => t.setValue(s.subfolderName).onChange(async (v) => { s.subfolderName = v.trim(); await save(); }));
+      new Setting(containerEl).setName('Subfolder Name').addText((t) => t.setValue(s.subfolderName).onChange(async (v) => { s.subfolderName = v.trim(); await save(); }));
     }
     new Setting(containerEl)
-      .setName('File name format')
+      .setName('File Name Format')
       .setDesc(`Moment.js format; a / makes a folder. Today's note: ${p.dayPath(moment().format('YYYY-MM-DD'))}`)
       .addText((t) => t.setValue(s.fileNameFormat).onChange(async (v) => { s.fileNameFormat = v; await save(); }));
 
-    containerEl.createEl('h3', { text: 'Updating' });
+    new Setting(containerEl).setName('Updating').setHeading();
 
     new Setting(containerEl)
-      .setName('Update automatically')
+      .setName('Update Automatically')
       .setDesc('When Obsidian starts, then on a timer. Browsers forget old history (Chrome keeps 90 days), so a note written today is the only copy later.')
       .addToggle((t) => t.setValue(s.autoUpdate).onChange(async (v) => { s.autoUpdate = v; await save(); }));
     new Setting(containerEl)
-      .setName('Every how many minutes')
+      .setName('Every How Many Minutes')
       .addText((t) => t.setValue(String(s.intervalMinutes)).onChange(async (v) => {
         const n = Math.max(1, parseInt(v, 10) || 10);
         s.intervalMinutes = n; await save(); p.restartTimer();
@@ -635,19 +645,19 @@ class ArchBrowserHistorySettingTab extends PluginSettingTab {
     const here = p.computer;
     const cur = s.automaticOn || here;
     new Setting(containerEl)
-      .setName('Automatic update runs on')
+      .setName('Automatic Update Runs On')
       .setDesc('The one computer that writes day notes by itself. The vaults are mirrored between computers; two writing the same day note at once would make conflict files. The commands work on every computer. ' + `This computer is ${here}.`)
       .addDropdown((d) => {
-        d.addOption(here, `${here} (this computer)`);
+        d.addOption(here, `${here} (This Computer)`);
         if (cur !== here && cur !== '*') d.addOption(cur, cur);
-        d.addOption('*', 'Every computer');
+        d.addOption('*', 'Every Computer');
         d.setValue(cur).onChange(async (v) => { s.automaticOn = v; await save(); });
       });
     new Setting(containerEl)
-      .setName('Update now')
+      .setName('Update Now')
       .addButton((b) => b.setButtonText('Update').onClick(() => p.update('command')));
 
-    containerEl.createEl('h3', { text: 'Browsers found on this computer' });
+    new Setting(containerEl).setName('Browsers Found on This Computer').setHeading();
     containerEl.createEl('p', { cls: 'setting-item-description', text: 'Looked for again every time, so a renamed profile or a new browser is picked up without any setting. Turn one off to leave it out.' });
     const cursors = p.cursorsHere();
     const found = p.sources();
@@ -665,7 +675,7 @@ class ArchBrowserHistorySettingTab extends PluginSettingTab {
         }));
     }
 
-    containerEl.createEl('h3', { text: 'Filtering' });
+    new Setting(containerEl).setName('Filtering').setHeading();
 
     this.textArea(containerEl, 'Pages to skip',
       'Redirects and consent pages that are not places you went. One per line: site/path-start. * matches any part of a site name, so google.* is every Google domain.',
@@ -674,7 +684,7 @@ class ArchBrowserHistorySettingTab extends PluginSettingTab {
       'Parts of an address that only say where a click came from. utm_* removes every parameter starting with utm_.',
       'trackingParams');
 
-    containerEl.createEl('h3', { text: 'Adult sites' });
+    new Setting(containerEl).setName('Adult Sites').setHeading();
     containerEl.createEl('p', { cls: 'setting-item-description', text: 'Visits to these are never written to a note, and the browser cleaner deletes them from the browser.' });
     this.textArea(containerEl, 'Words',
       'A site whose address contains one of these, or a search for one of them, counts as adult.',
@@ -683,7 +693,7 @@ class ArchBrowserHistorySettingTab extends PluginSettingTab {
       'Sites to treat as adult whatever their address says, one per line (example.com, or example.com/path). Stays in this vault\'s settings.',
       'adultSites', () => { p.refreshCleanerList(); p.schedulePurge(); });
     new Setting(containerEl)
-      .setName('Find more in my history')
+      .setName('Find More in My History')
       .setDesc('Lists sites whose page titles use the words above, to add with a tick.')
       .addButton((b) => b.setButtonText('Find').onClick(async () => {
         // Reading every visit takes a few seconds with Obsidian paused; say so first.
@@ -694,15 +704,15 @@ class ArchBrowserHistorySettingTab extends PluginSettingTab {
         new CandidatesModal(this.app, p, c, () => this.display()).open();
       }));
     new Setting(containerEl)
-      .setName('Browser cleaner extension')
+      .setName('Browser Cleaner Extension')
       .setDesc(p.cleanerInstalled()
         ? `Written to ${p.cleanerFolder()}. Its list follows these settings.`
         : 'Not written yet. It deletes adult visits from Chrome or Brave itself; the plugin cannot, because a running browser locks its history.')
       .addButton((b) => b.setButtonText(p.cleanerInstalled() ? 'Show steps' : 'Install').onClick(() => { p.installCleaner(); this.display(); }));
 
-    containerEl.createEl('h3', { text: 'Old notes' });
+    new Setting(containerEl).setName('Old Notes').setHeading();
     new Setting(containerEl)
-      .setName('Import day notes from the old Browser History plugin')
+      .setName('Import Day Notes from the Old Browser History Plugin')
       .setDesc('Merged in with the same filters; the old notes are only read.')
       .addButton((b) => b.setButtonText('Import…').onClick(() => new ImportModal(this.app, p).open()));
   }
