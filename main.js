@@ -499,6 +499,55 @@ class ArchBrowserHistory extends Plugin {
 
 /* ---------------- modals ---------------- */
 
+// The popup behind a long list's Manage… button, the same class in ARCH YT
+// Playlists, X Twitter, After Clipping and Browser History (change all together). He chose it on 2026-09-27
+// for every long list, the way Obsidian's own Excluded Files setting works: the
+// settings tab shows one card with the count, and the list is edited here, in a
+// box big enough to paste into. Only Cancel throws an edit away; Escape or the ✕
+// keep it, since a long paste lost to one key is worse than a save not asked for.
+class ListModal extends Modal {
+  constructor(app, { title, hint, value, placeholder, count, onSave }) {
+    super(app);
+    Object.assign(this, { title, hint, value, placeholder, count, onSave });
+    this.done = false;
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    this.titleEl.setText(this.title);
+    this.modalEl.style.width = 'min(720px, 92vw)';
+    if (this.hint) contentEl.createEl('p', { text: this.hint, cls: 'setting-item-description', attr: { style: 'margin-top:0;' } });
+    const ta = contentEl.createEl('textarea', {
+      attr: {
+        spellcheck: 'false',
+        'aria-label': this.title,
+        placeholder: this.placeholder || '',
+        style: 'width:100%; height:45vh; resize:vertical; font-family:var(--font-monospace); font-size:var(--font-ui-small); line-height:1.6;',
+      },
+    });
+    ta.value = this.value;
+    this.ta = ta;
+    const foot = contentEl.createDiv({ attr: { style: 'display:flex; align-items:center; gap:8px; margin-top:12px;' } });
+    const status = foot.createSpan({ cls: 'setting-item-description', attr: { style: 'flex:1; font-variant-numeric:tabular-nums;', 'aria-live': 'polite' } });
+    const update = () => status.setText(this.count(ta.value));
+    update();
+    ta.addEventListener('input', update);
+    const cancel = foot.createEl('button', { text: 'Cancel' });
+    cancel.onclick = () => { this.done = true; this.close(); };
+    const save = foot.createEl('button', { text: 'Save', cls: 'mod-cta' });
+    save.onclick = async () => { this.done = true; this.close(); await this.onSave(ta.value); };
+    // After Obsidian's own focus on the first button: the cursor goes to the end of the list.
+    setTimeout(() => { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }, 0);
+  }
+
+  onClose() {
+    if (!this.done && this.ta && this.ta.value !== this.value) {
+      this.onSave(this.ta.value).then(() => new Notice(`${this.title}: saved.`));
+    }
+    this.contentEl.empty();
+  }
+}
+
 class ImportModal extends Modal {
   constructor(app, plugin) { super(app); this.plugin = plugin; }
   onOpen() {
@@ -657,8 +706,10 @@ class ArchBrowserHistorySettingTab extends PluginSettingTab {
       .setName('Update Now')
       .addButton((b) => b.setButtonText('Update').onClick(() => p.update('command')));
 
-    new Setting(containerEl).setName('Browsers Found on This Computer').setHeading();
-    containerEl.createEl('p', { cls: 'setting-item-description', text: 'Looked for again every time, so a renamed profile or a new browser is picked up without any setting. Turn one off to leave it out.' });
+    // A heading's own description, not a loose paragraph under it (0.1.8).
+    new Setting(containerEl).setName('Browsers Found on This Computer')
+      .setDesc('Looked for again every time, so a renamed profile or a new browser is picked up without any setting. Turn one off to leave it out.')
+      .setHeading();
     const cursors = p.cursorsHere();
     const found = p.sources();
     if (!found.length) containerEl.createEl('p', { text: 'No browser history found.' });
@@ -677,19 +728,20 @@ class ArchBrowserHistorySettingTab extends PluginSettingTab {
 
     new Setting(containerEl).setName('Filtering').setHeading();
 
-    this.textArea(containerEl, 'Pages to skip',
+    this.listSetting(containerEl, 'Pages to Skip', 'pattern',
       'Redirects and consent pages that are not places you went. One per line: site/path-start. * matches any part of a site name, so google.* is every Google domain.',
       'skipPages');
-    this.textArea(containerEl, 'Tracking parameters to remove',
+    this.listSetting(containerEl, 'Tracking Parameters to Remove', 'parameter',
       'Parts of an address that only say where a click came from. utm_* removes every parameter starting with utm_.',
       'trackingParams');
 
-    new Setting(containerEl).setName('Adult Sites').setHeading();
-    containerEl.createEl('p', { cls: 'setting-item-description', text: 'Visits to these are never written to a note, and the browser cleaner deletes them from the browser.' });
-    this.textArea(containerEl, 'Words',
+    new Setting(containerEl).setName('Adult Sites')
+      .setDesc('Visits to these are never written to a note, and the browser cleaner deletes them from the browser.')
+      .setHeading();
+    this.listSetting(containerEl, 'Words', 'word',
       'A site whose address contains one of these, or a search for one of them, counts as adult.',
       'adultWords', () => { p.refreshCleanerList(); p.schedulePurge(); });
-    this.textArea(containerEl, 'Sites',
+    this.listSetting(containerEl, 'Sites', 'site',
       'Sites to treat as adult whatever their address says, one per line (example.com, or example.com/path). Stays in this vault\'s settings.',
       'adultSites', () => { p.refreshCleanerList(); p.schedulePurge(); });
     new Setting(containerEl)
@@ -708,7 +760,7 @@ class ArchBrowserHistorySettingTab extends PluginSettingTab {
       .setDesc(p.cleanerInstalled()
         ? `Written to ${p.cleanerFolder()}. Its list follows these settings.`
         : 'Not written yet. It deletes adult visits from Chrome or Brave itself; the plugin cannot, because a running browser locks its history.')
-      .addButton((b) => b.setButtonText(p.cleanerInstalled() ? 'Show steps' : 'Install').onClick(() => { p.installCleaner(); this.display(); }));
+      .addButton((b) => b.setButtonText(p.cleanerInstalled() ? 'Show Steps' : 'Install').onClick(() => { p.installCleaner(); this.display(); }));
 
     new Setting(containerEl).setName('Old Notes').setHeading();
     new Setting(containerEl)
@@ -717,19 +769,30 @@ class ArchBrowserHistorySettingTab extends PluginSettingTab {
       .addButton((b) => b.setButtonText('Import…').onClick(() => new ImportModal(this.app, p).open()));
   }
 
-  textArea(containerEl, name, desc, key, after) {
+  // A list with its count and a Manage… button; the list is edited in a popup
+  // (ListModal, 0.1.8). It was a narrow six-line box beside the description, which
+  // wrapped its lines mid-word ("accounts.goog / le.*").
+  listSetting(containerEl, name, noun, desc, key, after) {
+    const count = (text) => {
+      const n = String(text || '').split('\n').filter((l) => l.trim()).length;
+      return n ? `${n} ${noun}${n === 1 ? '' : 's'}` : `No ${noun}s yet`;
+    };
     new Setting(containerEl)
       .setName(name)
-      .setDesc(desc)
-      .addTextArea((t) => {
-        t.inputEl.rows = 6;
-        t.inputEl.style.width = '100%';
-        t.setValue(this.plugin.settings[key] || '').onChange(async (v) => {
-          this.plugin.settings[key] = v;
-          await this.plugin.saveSettings();
-          if (after) after();
-        });
-      });
+      .setDesc(`${count(this.plugin.settings[key])}. ${desc}`)
+      .addButton((b) => b.setButtonText('Manage\u2026').onClick(() =>
+        new ListModal(this.app, {
+          title: name,
+          hint: desc,
+          value: this.plugin.settings[key] || '',
+          count,
+          onSave: async (v) => {
+            this.plugin.settings[key] = v;
+            await this.plugin.saveSettings();
+            if (after) after();
+            this.display();
+          },
+        }).open()));
   }
 }
 

@@ -113,3 +113,12 @@ different from the other ARCH plugins, and the three popups' titles are real tit
 cleaner popup's *Show in Finder* button reads *Show in Files* on the PC (*Show in Explorer*
 on Windows), since only the Mac has a Finder. No spell-check underlines in the settings or
 the import folder box, whose fields hold paths, patterns and site lists.
+
+## 2026-09-27 — 0.1.8, lists behind Manage…, no loose paragraphs
+
+After the Title Case releases he asked: *"Did you work on UI of the plugins like button structures or something? Like in Arch YT Playlist, the toggle list to paste youtube channel links in is quite ugly."* The review had used a checklist (wording, keyboard, focus) that never judged layout. Shown three layouts, he chose a *Manage…* button opening a popup, the way Obsidian's own *Excluded files* setting works, and chose it for every list of that kind. Here that meant the four lists, *Pages to Skip*, *Tracking Parameters to Remove*,
+*Words* and *Sites*: each was a narrow six-line box beside its description, wrapping lines
+mid-word ("accounts.goog / le.*"). Each is now a card with its count and *Manage…*. The popup (`ListModal`, the same class in YT Playlists, X Twitter, After Clipping and Browser History) has a large box, a live count as you type, and *Cancel* and *Save*; only *Cancel* throws an edit away, since a long paste lost to Escape is worse than a save not asked for. Tried in TESTFIELD: the count, Cancel leaving the list alone, and Escape keeping an edit.
+The two paragraphs under *Browsers Found on This Computer* and *Adult Sites* are those
+headings' own descriptions, and two labels passed through a helper, which 0.1.7's Title
+Case missed, are fixed: *Pages to Skip*, *Tracking Parameters to Remove*, *Show Steps*.
