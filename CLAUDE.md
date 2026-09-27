@@ -124,7 +124,8 @@ startup, and `TESTFIELD`'s empty *Sites* list would have replaced GENERALS'.
   27 June) and the 114 old Ideaverse notes, imported with 44,859 visits kept and
   2,265 adult left out. Still runs in `TESTFIELD` too (symlink); its
   `Browses/` is test output, and was checked to hold nothing GENERALS lacks.
-- **0.1.6 in GENERALS** (copied in by hand since 0.1.2: BRAT's `updatePlugin`
+- **0.1.7 in GENERALS** (Title Case and Obsidian's own headings, from the UI review of
+  2026-09-27; copied in by hand since 0.1.2: BRAT's `updatePlugin`
   through `obsidian eval` hung; BRAT sees the same version as current). His
   **40 sites** are in the *Sites* list, among them broad ones he ticked himself:
   `itch.io`, `vk.com`, `vk.ru`, `vkvideo.ru`, `feedspot.com`, `link.me`,
