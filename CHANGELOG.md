@@ -122,3 +122,21 @@ mid-word ("accounts.goog / le.*"). Each is now a card with its count and *Manage
 The two paragraphs under *Browsers Found on This Computer* and *Adult Sites* are those
 headings' own descriptions, and two labels passed through a helper, which 0.1.7's Title
 Case missed, are fixed: *Pages to Skip*, *Tracking Parameters to Remove*, *Show Steps*.
+
+## 2026-09-28 — Found: the PC merged its Chrome history into the same day notes, doubling visit counts
+
+Found while clearing Syncthing conflict copies in GENERALS, at his request (*"Fix it for me"*).
+No code changed yet. On 2026-09-27 the plugin's synced `automaticOn` had been `*`, so the PC's copy
+ran too: the settings file's conflict copy from 15:32 that day holds a `readUpTo` cursor for
+`hoanganh-ubuntu`. The PC's Chrome shares history with the Mac's through Chrome sync, so every visit
+of its 90 days was merged a second time. Measured against GENERALS's last commit of each note (the
+Mac's 08:13 commit on 2026-09-27): all 90 day notes from 2026-06-29 to 2026-09-26 carry about ×1.5
+to ×2 the visits on the same lines, with 49 new lines (Google, Spotify, Gmail, Twitch, Shopee,
+Firefox pages), apparently visits only the PC had. The 26th went from matching its 22:30 copy at the
+08:13 commit to ×1.98 in the note written at 13:12. `automaticOn` is back to `Hoangs-MacBook-Pro`,
+so it has stopped. **The same conflict lost his last adult-list entry**: the conflict copy's
+*Sites* ends with `f95zone.to`, the kept settings do not; no day note names f95zone yet. Who set `*`
+is not on record; that setting is the one this file's *Not built: the PC's own browsers* says
+needs a design first. The repair (counts back to the committed values, the PC-only lines kept, the
+three addresses found only in the day-note conflict copies added, `f95zone.to` restored) waits for
+his go-ahead; `backup-strategy/CHANGELOG.md`, 2026-09-28, has the rest of that session.
