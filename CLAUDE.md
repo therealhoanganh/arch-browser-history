@@ -119,7 +119,7 @@ startup, and `TESTFIELD`'s empty *Sites* list would have replaced GENERALS'.
 
 ## Where things stand (edit in place)
 
-**Open, 2026-09-28: the day notes' visit counts are inflated and `f95zone.to` fell off *Sites*.** The PC merged its synced Chrome history into the same notes while `automaticOn` was `*` (2026-09-27). **Keep `automaticOn` naming one computer** until the PC's browsers have a design. Details, measurements and the proposed repair are in `CHANGELOG.md`, 2026-09-28.
+**Repaired 2026-09-28: the day notes' visit counts had been inflated, and `f95zone.to` had fallen off *Sites*.** The PC merged its synced Chrome history into the same notes while `automaticOn` was `*` (2026-09-27). **Keep `automaticOn` naming one computer** until the PC's browsers have a design. The account and the repair are in `CHANGELOG.md`, 2026-09-28.
 
 - **0.1.0 released** (2026-09-25) and installed through BRAT in **GENERALS**, which
   has `Browses/` with 219 day notes: the browsers from 9 June (Chrome from

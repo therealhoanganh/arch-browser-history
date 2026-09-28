@@ -140,3 +140,22 @@ is not on record; that setting is the one this file's *Not built: the PC's own b
 needs a design first. The repair (counts back to the committed values, the PC-only lines kept, the
 three addresses found only in the day-note conflict copies added, `f95zone.to` restored) waits for
 his go-ahead; `backup-strategy/CHANGELOG.md`, 2026-09-28, has the rest of that session.
+
+## 2026-09-28 — The day notes repaired, `f95zone.to` back on *Sites*
+
+At his word (*"Yes. go ahead"*). Obsidian was quit on both computers first, since the plugin holds
+its settings in memory. `f95zone.to` was appended to *Sites* in `data.json`, where the conflict copy
+had it; no day note names f95zone, so nothing needed removing. The notes were repaired on the Mac with
+the plugin's own `parseDayNote`, `mergeVisits` and `renderDayNote` (from `lib/clean.js`), after checking
+that they re-render all 92 notes byte for byte: for 29 June to 26 September, each line found in
+GENERALS's last commit of the note got that commit's count, time, address and title back, and the lines
+only the PC had added (about 50, a few a day) were kept. 91 notes changed, the visits recorded fell from
+133,425 to 86,854, and every one of the 90 past days now matches its committed counts. The 27th and 28th
+were checked against a copy of the Mac's Chrome history up to the plugin's cursor (visit 69588) and were
+not inflated; their only differences were Cloudflare check pages ("Verify You're Human", "Just a
+moment…") whose title Chrome replaces after the check, so a recount from Chrome cannot place them, and
+their counts were left as written. The two addresses found only in the 27th's conflict copy (an X post
+and `x.com`) were merged into it; the 26th's one (a Spotify playlist) already had a line under the same
+site and title. The three conflict copies were then deleted. The notes as they were before the repair
+were copied to the PC session's scratchpad, which does not outlive the session; GENERALS's git holds the
+committed versions. Not committed in GENERALS, which waits for its large files to move to 4T-HDD.
